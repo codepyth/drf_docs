@@ -4,6 +4,9 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from .models import MyUser
+from .serializers import *
+from rest_framework.decorators import api_view
+
 # Create your views here.
 
 
@@ -46,10 +49,61 @@ def register(request):
     if not password:
         return Response({'response': 'password required and minimum 10 Characters!'},
                         status=status.HTTP_400_BAD_REQUEST)
-
-    user = MyUser.objects.create(first_name=first_name, last_name=last_name, email=email, username=username,
+    
+    is_staff = True
+    user = MyUser.objects.create(first_name=first_name, last_name=last_name, email=email, is_staff=is_staff, username=username,
                                  password=password)
     user.set_password(password)
     user.save()
 
     return Response({"success": True, 'status': status.HTTP_201_CREATED, 'message': 'Congratulations, Registered!'})
+
+
+@api_view(['POST'])
+def add_employee(request):
+    if request.method == 'POST':
+        serializers = EmployeeSerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data,status=status.HTTP_201_CREATED)
+        return Response(serializers.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_all_employees(request):
+    if request.method == 'GET':
+        emp = employee.objects.all()
+        serializers = EmployeeSerializer(emp,many=True)
+        return Response(serializers.data)
+
+
+@api_view(['GET'])
+def get_signle_employee(request, id):
+    if request.method == 'GET':
+        try:
+            emp = employee.objects.get(id=id)
+            serializers = EmployeeSerializer(emp)
+            return Response(serializers.data)
+        except employee.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PUT'])
+def update_employee(request,id):
+    obj = employee.objects.get(id=id)
+    serializer = EmployeeSerializer(obj , data=request.data, partial = True)
+
+    if serializer.is_valid():
+            serializer.save()
+            return Response({"msg" : "data updated"})
+    return Response(serializer.errors)
+
+
+@api_view(['DELETE'])
+def delete_employee(request,id):
+    if request.method == "DELETE":
+        obj = employee.objects.get(id=id)
+        obj.delete()
+        return Response({ "msg" : "data deleted"  })
+
+

@@ -1,3 +1,5 @@
+from operator import mod
+from pickletools import markobject
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 import uuid
@@ -64,3 +66,14 @@ class MyUser(AbstractBaseUser):
     # Does this user have permission to view this app? (ALWAYS YES FOR SIMPLICITY)
     def has_module_perms(self, app_label):
         return True
+    
+
+
+class employee(models.Model):
+    name = models.CharField(max_length=100)
+    age = models.PositiveIntegerField(default=23)
+    country = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.name
+    
