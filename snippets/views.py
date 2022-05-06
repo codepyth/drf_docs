@@ -105,6 +105,29 @@ def get_signle_employee(request, id):
         except employee.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['GET'])
+def filter_employees(request):
+    name = request.query_params.get('name')
+    if name is not None:
+        name = employee.objects.filter(name__icontains=name)
+        print(name)
+        if name:
+            serializer = EmployeeSerializer(name, many=True)
+            return Response({'success': True, 'response': {
+                'message': serializer.data,
+                'status': status.HTTP_200_OK}
+                             })
+        else:
+            return Response({'success': False, 'response': {
+                'message': 'Object does not exist',
+                'status': status.HTTP_404_NOT_FOUND}
+                             })
+    else:
+        return Response({'success': False, 'response': {
+                'message': 'Enter Name for search',
+                'status': status.HTTP_204_NO_CONTENT}
+                             })
+
 
 @api_view(['PUT'])
 def update_employee(request,id):
