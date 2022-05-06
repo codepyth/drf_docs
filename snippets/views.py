@@ -59,6 +59,24 @@ def register(request):
     return Response({"success": True, 'status': status.HTTP_201_CREATED, 'message': 'Congratulations, Registered!'})
 
 
+@api_view(['GET'])
+def get_user(request):
+    if request.method == 'GET':
+        id = request.data['id'] if 'id' in request.data else None
+        try:
+            if id:
+                user = MyUser.objects.get(id=id)
+                serializer = UserRegisterSerializer(user)
+            else:
+                users = MyUser.objects.all()
+                serializer = UserRegisterSerializer(users, many=True)
+        except:
+            return Response('No user found', status=status.HTTP_404_NOT_FOUND)
+        
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+
 @api_view(['POST'])
 def add_employee(request):
     if request.method == 'POST':
