@@ -4,6 +4,7 @@ from snippets.models import MyUser
 # Create your models here.
 
 class TodoMobilez(models.Model):
+    """This model will be used for ToDo actions"""
     mobile = models.CharField(max_length = 180)
     timestamp = models.DateTimeField(auto_now_add = True, auto_now = False, blank = True)
     completed = models.BooleanField(default = False, blank = True)
